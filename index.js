@@ -7,11 +7,8 @@ const cloudinary = require('./config/cloudinary');
 const path = require('path');
 
 const app = express();
-<<<<<<< HEAD
 const port = process.env.PORT || 3000; 
-=======
-const port = process.env.PORT || 3000;
->>>>>>> 919ca51 (first)
+
 
 const Product = require('./src/products/products.model');
 
@@ -25,21 +22,7 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-<<<<<<< HEAD
   origin: 'https://ecommerce-frontend-zeta-kohl.vercel.app/',
-=======
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps, curl, Postman)
-    if(!origin) return callback(null, true);
-    
-    // Allow all Render domains for seamless deployment
-    if(allowedOrigins.indexOf(origin) === -1 && !origin.endsWith('.onrender.com')) {
-      console.log('Origin allowed:', origin);
-    }
-    // Always allow to prevent CORS issues during deployment
-    return callback(null, true);
-  },
->>>>>>> 919ca51 (first)
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
