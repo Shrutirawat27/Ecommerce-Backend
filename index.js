@@ -18,6 +18,8 @@ const allowedOrigins = [
   'http://localhost:5174',
   'http://localhost:3000',
   'http://localhost:5175',
+  'https://ecommerce-frontend-pa3brq7dw-shruti-rawats-projects.vercel.app',
+  'https://ecommerce-frontend-xi-dun.vercel.app'
 ];
 
 // Configure CORS securely
