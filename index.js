@@ -114,17 +114,10 @@ async function main() {
 
 main().catch(err => console.error("MongoDB Connection Error:", err));
 
-// Serve frontend in production
-if (isProduction) {
-  app.use(express.static(path.join(__dirname, '../frontend/dist')));
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-  });
-} else {
-  app.get('/', (req, res) => {
-    res.send('Server is running in development mode');
-  });
-}
+// Serve a basic message in production as well
+app.get('/', (req, res) => {
+  res.send('E-commerce backend is live');
+});
 
 // Start the server
 app.listen(port, () => {
