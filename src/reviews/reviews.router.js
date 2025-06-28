@@ -15,18 +15,19 @@ router.post("/post-review", async (req, res) => {
         const existingReview = await Reviews.findOne({productId, userId});
 
         if(existingReview) {
-          //update reviews
           existingReview.comment = comment;
           existingReview.rating = rating;
           await existingReview.save();
         } else {
-            // create new review
             const newReview = new Reviews({
-                comment, rating, productId, userId
-            })
-            await newReview.save();
-        }
+            comment, rating, productId, userId
+        });
+          await newReview.save();
 
+          await Products.findByIdAndUpdate(productId, {
+          $push: { reviews: newReview._id }
+        });
+        }
 
         const reviews = await Reviews.find({productId});
         if(reviews.length > 0) {
@@ -65,12 +66,12 @@ router.get("/total-reviews", async(req, res) => {
 
 // get reviews by userId
 router.get("/:userId", async (req, res) => {
-    const {} = req.params;
+    const {userId} = req.params;
     if(!userId) {
         return res.status(400).send({ message: "User ID is required"});
     }
     try {
-        const reviews = await Reviews.find({userId: userId}).sort({createAt: -1});
+        const reviews = await Reviews.find({userId: userId}).sort({createdAt: -1});
         if(reviews.length === 0) {
             return res.status(404).send({ message: "No reviews found"});
         }

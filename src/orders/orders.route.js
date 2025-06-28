@@ -6,13 +6,12 @@ const mongoose = require('mongoose');
 // Debug route for order checkout
 router.post('/checkout-debug', async (req, res) => {
   try {
-    console.log("Debug checkout route called");
-    console.log("Request body:", JSON.stringify(req.body, null, 2));
-    console.log("Auth header:", req.headers.authorization);
+    // console.log("Debug checkout route called");
+    // console.log("Request body:", JSON.stringify(req.body, null, 2));
+    // console.log("Auth header:", req.headers.authorization);
     
     const { userId, products, totalAmount, deliveryInfo } = req.body;
     
-    // Basic validation
     if (!userId) {
       return res.status(400).json({ 
         message: 'Missing userId', 
@@ -21,7 +20,6 @@ router.post('/checkout-debug', async (req, res) => {
       });
     }
     
-    // Check if userId is a valid ObjectId
     let isValidObjectId = false;
     try {
       isValidObjectId = mongoose.Types.ObjectId.isValid(userId);
@@ -51,8 +49,8 @@ router.post('/checkout-debug', async (req, res) => {
   }
 });
 
-router.get('/', getOrders);  // Fetch orders
-router.post('/', createOrder); // Place an order - changed from /create to / to match frontend
-router.patch('/:id', updateOrderStatus); // Update order status
+router.get('/', getOrders);  
+router.post('/', createOrder); 
+router.patch('/:id', updateOrderStatus); 
 
 module.exports = router;

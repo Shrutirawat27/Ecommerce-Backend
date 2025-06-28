@@ -6,10 +6,11 @@ const ProductSchema = new mongoose.Schema({
     description: { type: String },
     price: { type: Number, required: true },
     oldPrice: { type: Number },
-    image1: { type: String, required: true }, // Ensure Cloudinary URL is stored
+    image1: { type: String, required: true }, 
     color: { type: String },
     rating: { type: Number, default: 0 },
-    author: { type: mongoose.Types.ObjectId, ref: "User", required: true }
+    author: { type: mongoose.Types.ObjectId, ref: "User", required: true },
+    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
 });
 
 const Product = mongoose.model("Product", ProductSchema);

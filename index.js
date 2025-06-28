@@ -7,36 +7,39 @@ const cloudinary = require('./config/cloudinary');
 const path = require('path');
 
 const app = express();
-const port = process.env.PORT || 3000; 
-
+const port = process.env.PORT || 3000;
+const isProduction = process.env.NODE_ENV === 'production';
 
 const Product = require('./src/products/products.model');
 
-// Middleware setup
+// Allowed origins
 const allowedOrigins = [
-  'http://localhost:5173', 
-  'http://localhost:5174', 
-  'http://localhost:3000', 
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'http://localhost:3000',
   'http://localhost:5175',
-  'https://ecommerce-frontend-zeta-kohl.vercel.app/'
 ];
 
+// Configure CORS securely
 app.use(cors({
-  origin: 'https://ecommerce-frontend-zeta-kohl.vercel.app/',
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, origin); 
+    } else {
+      callback(new Error("CORS not allowed from this origin: " + origin));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Length', 'X-Content-Type-Options']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: ['Content-Length']
 }));
 
+// Middleware
 app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-
-// Serve static files from public directory
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
-
-// Add debugging middleware for static file requests
 app.use((req, res, next) => {
   if (req.url.startsWith('/uploads')) {
     console.log('Static file request:', req.url);
@@ -44,10 +47,7 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-// Add global request logger for debugging
 app.use((req, res, next) => {
-  // Only log API requests
   if (req.url.startsWith('/api')) {
     const requestLog = {
       method: req.method,
@@ -55,13 +55,12 @@ app.use((req, res, next) => {
       contentType: req.headers['content-type'],
       userAgent: req.headers['user-agent']
     };
-    
-    console.log('\n🔍 Request:', JSON.stringify(requestLog, null, 2));
-    
-    // Capture and log response
+
+    // console.log('\n Request:', JSON.stringify(requestLog, null, 2));
+
     const originalSend = res.send;
-    res.send = function(body) {
-      console.log(`📤 Response ${res.statusCode}:`, 
+    res.send = function (body) {
+      console.log(` Response ${res.statusCode}:`,
         typeof body === 'object' ? JSON.stringify(body).substring(0, 150) + '...' : body);
       return originalSend.apply(this, arguments);
     };
@@ -69,15 +68,12 @@ app.use((req, res, next) => {
   next();
 });
 
-// Allow all preflight requests
-app.options('*', cors());
-
-// Search route for products
+// Product search route
 app.get('/api/products/search', async (req, res) => {
   const { searchQuery } = req.query;
 
   if (!searchQuery || !searchQuery.trim()) {
-    return res.json([]); // ✅ Returns an empty array instead of an error
+    return res.json([]);
   }
 
   try {
@@ -92,8 +88,7 @@ app.get('/api/products/search', async (req, res) => {
   }
 });
 
-
-// Routes
+// Import routes
 const authRoutes = require('./src/users/user.route');
 const productRoutes = require("./src/products/products.route");
 const reviewRoutes = require("./src/reviews/reviews.router");
@@ -119,12 +114,9 @@ async function main() {
 
 main().catch(err => console.error("MongoDB Connection Error:", err));
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  // Serve any static files from the frontend build directory
+// Serve frontend in production
+if (isProduction) {
   app.use(express.static(path.join(__dirname, '../frontend/dist')));
-
-  // For any other route, send the index.html file
   app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
   });
@@ -134,6 +126,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
+// Start the server
 app.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });

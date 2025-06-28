@@ -6,10 +6,10 @@ if (!process.env.JWT_SECRET_KEY) {
 const JWT_SECRET = process.env.JWT_SECRET_KEY;
 
 const verifyToken = (req, res, next) => {
-    console.log("Received Authorization Header:", req.headers["authorization"]);
+    //console.log("Received Authorization Header:", req.headers["authorization"]);
 
     const token = req.headers["authorization"]?.split(" ")[1];
-    console.log("Extracted Token:", token);
+    //console.log("Extracted Token:", token);
 
     if (!token) {
         return res.status(401).send({ message: "Token is required" });
@@ -17,21 +17,19 @@ const verifyToken = (req, res, next) => {
 
     try {
         const decoded = jwt.verify(token, JWT_SECRET);
-        console.log("Decoded Token:", decoded);  // Log the decoded token to check its content
+        //console.log("Decoded Token:", decoded);  
 
         req.user = {
-            _id: decoded.userId || decoded.id,  // Support both formats
+            _id: decoded.userId || decoded.id,  
             role: decoded.role
         };
         req.role = decoded.role;
-
         next();
 
     } catch (error) {
         console.error("Token Verification Error:", error);
         
         if (error.name === 'TokenExpiredError') {
-            // Instead of just returning an error, include a flag that indicates refresh is needed
             return res.status(401).send({ 
                 message: "Token has expired", 
                 needsRefresh: true 
