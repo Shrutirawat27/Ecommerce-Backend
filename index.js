@@ -40,28 +40,33 @@ app.use(express.json({ limit: "25mb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/uploads', express.static(path.join(__dirname, 'public/uploads')));
+
+// Cleaned up static file logger
 app.use((req, res, next) => {
-  if (req.url.startsWith('/uploads')) {
-    console.log('Static file request:', req.url);
-    console.log('Looking in:', path.join(__dirname, 'public', req.url));
-  }
+  // if (req.url.startsWith('/uploads')) {
+  //   console.log('Static file request:', req.url);
+  //   console.log('Looking in:', path.join(__dirname, 'public', req.url));
+  // }
   next();
 });
+
+// Cleaned up API response logger
 app.use((req, res, next) => {
   if (req.url.startsWith('/api')) {
-    const requestLog = {
-      method: req.method,
-      url: req.url,
-      contentType: req.headers['content-type'],
-      userAgent: req.headers['user-agent']
-    };
+    // const requestLog = {
+    //   method: req.method,
+    //   url: req.url,
+    //   contentType: req.headers['content-type'],
+    //   userAgent: req.headers['user-agent']
+    // };
 
     // console.log('\n Request:', JSON.stringify(requestLog, null, 2));
 
     const originalSend = res.send;
     res.send = function (body) {
-      console.log(` Response ${res.statusCode}:`,
-        typeof body === 'object' ? JSON.stringify(body).substring(0, 150) + '...' : body);
+      // Commented out response logging
+      // console.log(` Response ${res.statusCode}:`,
+      //   typeof body === 'object' ? JSON.stringify(body).substring(0, 150) + '...' : body);
       return originalSend.apply(this, arguments);
     };
   }
