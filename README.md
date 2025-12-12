@@ -13,6 +13,9 @@ https://herstyle-ecommerce.vercel.app/
 - Responsive UI with clean styling
 - Secure backend routes and validations
 
+## Screenshot
+![Web Page Screenshot](src/assets/E-commerceinterface.png)
+
 ## Technologies Used
 ### Frontend
 - React.js  
@@ -53,6 +56,7 @@ https://herstyle-ecommerce.vercel.app/
 - config/  
 - public/  
 - src/  
+  - assets/
   - middleware/  
   - orders/  
   - products/  
