@@ -5,13 +5,14 @@ const mongoose = require('mongoose');
 const getOrders = async (req, res) => {
   try {
     const orders = await Order.find()
+      .sort({ createdAt: -1 })
       .populate('userId', 'name email')  
       .populate({
         path: 'products.productId',
         select: 'name image1 price'  
       })
       .lean();  
-    //console.log("Orders from DB:", orders);
+console.log("Fetched orders sorted:", orders.map(o => o.orderDate));
 
     res.json(orders);
   } catch (error) {
