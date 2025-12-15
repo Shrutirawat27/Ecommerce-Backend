@@ -1,56 +1,62 @@
 const express = require('express');
 const router = express.Router();
-const { getOrders, createOrder, updateOrderStatus } = require('./orders.controller');
 const mongoose = require('mongoose');
 
-// Debug route for order checkout
+const verifyToken = require('../middleware/verifyToken'); // adjust path if needed
+const {
+  getOrders,
+  createOrder,
+  updateOrderStatus
+} = require('./orders.controller');
+
+/* =========================
+   DEBUG ROUTE (UNCHANGED)
+========================= */
 router.post('/checkout-debug', async (req, res) => {
   try {
-    // console.log("Debug checkout route called");
-    // console.log("Request body:", JSON.stringify(req.body, null, 2));
-    // console.log("Auth header:", req.headers.authorization);
-    
     const { userId, products, totalAmount, deliveryInfo } = req.body;
-    
+
     if (!userId) {
-      return res.status(400).json({ 
-        message: 'Missing userId', 
+      return res.status(400).json({
+        message: 'Missing userId',
         receivedValue: userId,
-        valueType: typeof userId 
+        valueType: typeof userId
       });
     }
-    
-    let isValidObjectId = false;
-    try {
-      isValidObjectId = mongoose.Types.ObjectId.isValid(userId);
-    } catch (error) {
-      console.error("Error validating ObjectId:", error);
-    }
-    
+
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(userId);
+
     return res.status(200).json({
       message: 'Debug info',
       userIdReceived: userId,
-      userIdType: typeof userId,
       isValidObjectId,
       productsCount: products?.length || 0,
       deliveryInfoComplete: Boolean(
-        deliveryInfo?.firstName && 
-        deliveryInfo?.lastName && 
+        deliveryInfo?.firstName &&
+        deliveryInfo?.lastName &&
         deliveryInfo?.email &&
         deliveryInfo?.address?.street
       )
     });
   } catch (error) {
-    console.error("Debug checkout error:", error);
-    return res.status(500).json({ 
-      message: 'Error in debug checkout', 
-      error: error.message 
+    return res.status(500).json({
+      message: 'Error in debug checkout',
+      error: error.message
     });
   }
 });
 
-router.get('/', getOrders);  
-router.post('/', createOrder); 
-router.patch('/:id', updateOrderStatus); 
+/* =========================
+   REAL ROUTES
+========================= */
+
+// USER + ADMIN (filtered inside controller)
+router.get('/', verifyToken, getOrders);
+
+// USER creates order
+router.post('/', verifyToken, createOrder);
+
+// ADMIN updates order status
+router.patch('/:id', verifyToken, updateOrderStatus);
 
 module.exports = router;
