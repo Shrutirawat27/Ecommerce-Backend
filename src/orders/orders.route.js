@@ -2,16 +2,14 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-const verifyToken = require('../middleware/verifyToken'); // adjust path if needed
+const verifyToken = require('../middleware/verifyToken'); 
 const {
   getOrders,
   createOrder,
   updateOrderStatus
 } = require('./orders.controller');
 
-/* =========================
-   DEBUG ROUTE (UNCHANGED)
-========================= */
+/* Debug Route */
 router.post('/checkout-debug', async (req, res) => {
   try {
     const { userId, products, totalAmount, deliveryInfo } = req.body;
@@ -46,17 +44,13 @@ router.post('/checkout-debug', async (req, res) => {
   }
 });
 
-/* =========================
-   REAL ROUTES
-========================= */
-
-// USER + ADMIN (filtered inside controller)
+// User + Admin 
 router.get('/', verifyToken, getOrders);
 
-// USER creates order
+// User creates order
 router.post('/', verifyToken, createOrder);
 
-// ADMIN updates order status
+// Admin updates order status
 router.patch('/:id', verifyToken, updateOrderStatus);
 
 module.exports = router;

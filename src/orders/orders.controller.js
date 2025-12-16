@@ -1,19 +1,13 @@
 const Order = require('./orders.model');
 const mongoose = require('mongoose');
 
-/**
- * GET ORDERS
- * - Admin → all orders
- * - User  → only their orders
- */
+/* Get Orders */
 const getOrders = async (req, res) => {
   try {
-    console.log("Fetching orders for user:", req.user);
+    // console.log("Fetching orders for user:", req.user);
 
-    // Admin sees all orders, users see only their orders
     let filter = {};
     if (req.user.role !== 'admin') {
-      // Ensure _id is ObjectId
       filter.userId = req.user._id instanceof mongoose.Types.ObjectId
         ? req.user._id
         : new mongoose.Types.ObjectId(req.user._id);
@@ -27,7 +21,7 @@ const getOrders = async (req, res) => {
         select: 'name image1 price'
       });
 
-    console.log(`Found ${orders.length} orders for userId=${req.user._id}`);
+    // console.log(`Found ${orders.length} orders for userId=${req.user._id}`);
     res.json(orders);
   } catch (error) {
     console.error("Error fetching orders:", error);
@@ -36,10 +30,7 @@ const getOrders = async (req, res) => {
 };
 
 
-/**
- * CREATE ORDER
- * - userId comes from JWT (req.user._id)
- */
+/* Create Order */
 const createOrder = async (req, res) => {
   try {
     const { products, totalAmount, deliveryInfo, paymentMethod = 'cod' } = req.body;
@@ -92,10 +83,7 @@ const createOrder = async (req, res) => {
   }
 };
 
-/**
- * UPDATE ORDER STATUS
- * - Admin only
- */
+/* Update Order Status - Admin only */
 const updateOrderStatus = async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
