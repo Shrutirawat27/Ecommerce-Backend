@@ -86,12 +86,14 @@ const productRoutes = require("./src/products/products.route");
 const reviewRoutes = require("./src/reviews/reviews.router");
 const adminRoutes = require('./src/middleware/admin.routes');
 const orderRoutes = require('./src/orders/orders.route');
+const cartRoutes = require('./src/cart/cartRoutes'); 
 
 app.use('/api/user', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/cart', cartRoutes);
 
 // MongoDB connection
 async function main() {
