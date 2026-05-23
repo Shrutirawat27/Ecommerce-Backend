@@ -4,15 +4,25 @@ const Product = require('../products/products.model');
 // Get user cart
 const getCart = async (req, res) => {
   try {
-    let cart = await Cart.findOne({ user: req.user._id });
+
+    const cart = await Cart.findOne({
+      user: req.user._id
+    });
+
     if (!cart) {
-      cart = await Cart.create({ user: req.user._id, products: [] });
+      return res.json({
+        products: []
+      });
     }
 
     const productsWithDetails = await Promise.all(
       cart.products.map(async (item) => {
-        const product = await Product.findById(item.productId);
+
+        const product =
+          await Product.findById(item.productId);
+
         if (!product) return null;
+
         return {
           _id: product._id,
           name: product.name,
@@ -23,35 +33,68 @@ const getCart = async (req, res) => {
       })
     );
 
-    res.json({ products: productsWithDetails.filter(p => p) });
+    res.json({
+      products: productsWithDetails.filter(Boolean)
+    });
+
   } catch (err) {
+
     console.error(err);
-    res.status(500).json({ message: 'Failed to fetch cart' });
+
+    res.status(500).json({
+      message: 'Failed to fetch cart'
+    });
   }
 };
 
 // Update cart
 const updateCart = async (req, res) => {
   try {
+
     const { products } = req.body;
-    let cart = await Cart.findOne({ user: req.user._id });
+
+    let cart = await Cart.findOne({
+      user: req.user._id
+    });
 
     const backendProducts = products.map(p => ({
       productId: p._id,
       quantity: p.quantity
     }));
 
+    if (!backendProducts.length) {
+
+      await Cart.findOneAndDelete({
+        user: req.user._id
+      });
+
+      return res.json({
+        products: []
+      });
+    }
+
     if (!cart) {
-      cart = await Cart.create({ user: req.user._id, products: backendProducts });
+
+      cart = await Cart.create({
+        user: req.user._id,
+        products: backendProducts
+      });
+
     } else {
+
       cart.products = backendProducts;
+
       await cart.save();
     }
 
     const productsWithDetails = await Promise.all(
       cart.products.map(async (item) => {
-        const product = await Product.findById(item.productId);
+
+        const product =
+          await Product.findById(item.productId);
+
         if (!product) return null;
+
         return {
           _id: product._id,
           name: product.name,
@@ -62,20 +105,39 @@ const updateCart = async (req, res) => {
       })
     );
 
-    res.json({ products: productsWithDetails.filter(p => p) });
+    res.json({
+      products: productsWithDetails.filter(p => p)
+    });
+
   } catch (err) {
+
     console.error(err);
-    res.status(500).json({ message: 'Failed to update cart' });
+
+    res.status(500).json({
+      message: 'Failed to update cart'
+    });
   }
 };
 
 // Clear cart
 const clearCart = async (req, res) => {
   try {
-    await Cart.findOneAndUpdate({ user: req.user._id }, { products: [] }, { new: true });
-    res.json({ message: 'Cart cleared' });
+
+    await Cart.findOneAndDelete({
+      user: req.user._id
+    });
+
+    res.json({
+      message: 'Cart cleared'
+    });
+
   } catch (err) {
-    res.status(500).json({ message: 'Failed to clear cart' });
+
+    console.error(err);
+
+    res.status(500).json({
+      message: 'Failed to clear cart'
+    });
   }
 };
 
