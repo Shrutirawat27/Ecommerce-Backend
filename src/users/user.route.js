@@ -19,10 +19,15 @@ const upload = multer({
   }
 });
 
+const isProduction =
+  process.env.NODE_ENV === 'production';
+
 const cookieOptions = {
   httpOnly: true,
-  secure: false,
-  sameSite: 'Lax'
+  secure: isProduction,
+  sameSite: isProduction
+    ? 'None'
+    : 'Lax'
 };
 
 /* REGISTER */

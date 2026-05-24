@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
 
-const verifyToken = require('../middleware/verifyToken'); 
+const verifyToken = require('../middleware/verifyToken');
+const verifyAdmin = require('../middleware/verifyAdmin');
+
 const {
   getOrders,
   createOrder,
@@ -44,13 +46,26 @@ router.post('/checkout-debug', async (req, res) => {
   }
 });
 
-// User + Admin 
-router.get('/', verifyToken, getOrders);
+// User + Admin
+router.get(
+  '/',
+  verifyToken,
+  getOrders
+);
 
 // User creates order
-router.post('/', verifyToken, createOrder);
+router.post(
+  '/',
+  verifyToken,
+  createOrder
+);
 
-// Admin updates order status
-router.patch('/:id', verifyToken, updateOrderStatus);
+// ONLY ADMIN can update order status
+router.patch(
+  '/:id',
+  verifyToken,
+  verifyAdmin,
+  updateOrderStatus
+);
 
 module.exports = router;
