@@ -12,11 +12,10 @@ const router = express.Router();
 router.post("/create-product", verifyToken, verifyAdmin, upload.single('image1'), async (req, res) => {
   try {
     const newProduct = new Products({
-  ...req.body,
-  sizes: req.body.sizes ? JSON.parse(req.body.sizes) : [],
-  image1: req.file?.path || "",
-  author: req.user._id
-});
+      ...req.body,
+      image1: req.file?.path || "", 
+      author: req.user._id
+    });
 
     const savedProduct = await newProduct.save();
 
