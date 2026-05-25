@@ -8,12 +8,38 @@ const ProductSchema = new mongoose.Schema({
     oldPrice: { type: Number },
     image1: { type: String, required: true }, 
     color: { type: String },
-    sizes: { type: [String], default: [], },
+    sizes: { type: [String], default: [] },
     rating: { type: Number, default: 0 },
-    author: { type: mongoose.Types.ObjectId, ref: "User", required: true },
-    reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: "Review" }],
+    author: {
+      type: mongoose.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    reviews: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Review"
+    }],
+}, {
+    timestamps: true
 });
 
-const Product = mongoose.model("Product", ProductSchema);
+/* Indexes */
+
+ProductSchema.index({
+  category: 1
+});
+
+ProductSchema.index({
+  color: 1
+});
+
+ProductSchema.index({
+  price: 1
+});
+
+const Product = mongoose.model(
+  "Product",
+  ProductSchema
+);
 
 module.exports = Product;

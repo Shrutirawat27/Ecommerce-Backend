@@ -15,23 +15,43 @@ const getCart = async (req, res) => {
       });
     }
 
-    const productsWithDetails = await Promise.all(
-      cart.products.map(async (item) => {
+    const productIds = cart.products.map(
+  (item) => item.productId
+);
 
-        const product =
-          await Product.findById(item.productId);
+const dbProducts = await Product.find({
+  _id: { $in: productIds }
+});
 
-        if (!product) return null;
+const productMap = dbProducts.reduce(
+  (acc, product) => {
 
-        return {
-          _id: product._id,
-          name: product.name,
-          price: product.price,
-          image: product.image1,
-          quantity: item.quantity,
-        };
-      })
-    );
+    acc[product._id.toString()] = product;
+
+    return acc;
+  },
+  {}
+);
+
+const productsWithDetails = cart.products.map(
+  (item) => {
+
+    const product =
+      productMap[
+        item.productId.toString()
+      ];
+
+    if (!product) return null;
+
+    return {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image1,
+      quantity: item.quantity,
+    };
+  }
+);
 
     res.json({
       products: productsWithDetails.filter(Boolean)
@@ -87,23 +107,43 @@ const updateCart = async (req, res) => {
       await cart.save();
     }
 
-    const productsWithDetails = await Promise.all(
-      cart.products.map(async (item) => {
+    const productIds = cart.products.map(
+  (item) => item.productId
+);
 
-        const product =
-          await Product.findById(item.productId);
+const dbProducts = await Product.find({
+  _id: { $in: productIds }
+});
 
-        if (!product) return null;
+const productMap = dbProducts.reduce(
+  (acc, product) => {
 
-        return {
-          _id: product._id,
-          name: product.name,
-          price: product.price,
-          image: product.image1,
-          quantity: item.quantity,
-        };
-      })
-    );
+    acc[product._id.toString()] = product;
+
+    return acc;
+  },
+  {}
+);
+
+const productsWithDetails = cart.products.map(
+  (item) => {
+
+    const product =
+      productMap[
+        item.productId.toString()
+      ];
+
+    if (!product) return null;
+
+    return {
+      _id: product._id,
+      name: product.name,
+      price: product.price,
+      image: product.image1,
+      quantity: item.quantity,
+    };
+  }
+);
 
     res.json({
       products: productsWithDetails.filter(p => p)

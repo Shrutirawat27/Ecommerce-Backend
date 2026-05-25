@@ -13,30 +13,18 @@ const isProduction = process.env.NODE_ENV === 'production';
 const Product = require('./src/products/products.model');
 
 // Allowed origins
-const allowedOrigins = [
-  'http://localhost:5173',
-  'http://localhost:5174',
-  'http://localhost:3000',
-  'http://localhost:5175',
-  'https://ecommerce-frontend-pa3brq7dw-shruti-rawats-projects.vercel.app',
-  'https://ecommerce-frontend-xi-dun.vercel.app',
-  'https://herstyle-ecommerce.vercel.app'
-
-];
-
-// Configure CORS securely
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, origin); 
-    } else {
-      callback(new Error("CORS not allowed from this origin: " + origin));
-    }
-  },
+  origin: [
+    'http://localhost:5173',
+    'http://localhost:5174',
+    'http://localhost:5175',
+    'https://ecommerce-frontend-pa3brq7dw-shruti-rawats-projects.vercel.app',
+    'https://ecommerce-frontend-xi-dun.vercel.app',
+    'https://herstyle-ecommerce.vercel.app'
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Content-Length']
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 // Middleware

@@ -36,22 +36,86 @@ router.post('/register', async (req, res) => {
   try {
 
     const {
-      username,
-      email,
-      password
-    } = req.body;
+  username,
+  email,
+  password
+} = req.body;
 
-    const user = new User({
-      username,
-      email,
-      password
-    });
+/* Validation */
 
-    await user.save();
+if (
+  !username ||
+  !email ||
+  !password
+) {
 
-    res.status(201).json({
-      message: 'User registered successfully!'
-    });
+  return res.status(400).json({
+    message: 'All fields are required'
+  });
+}
+
+if (
+  username.trim().length < 3
+) {
+
+  return res.status(400).json({
+    message:
+      'Username must be at least 3 characters'
+  });
+}
+
+const emailRegex =
+  /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+if (
+  !emailRegex.test(email)
+) {
+
+  return res.status(400).json({
+    message:
+      'Invalid email address'
+  });
+}
+
+if (
+  password.length < 6
+) {
+
+  return res.status(400).json({
+    message:
+      'Password must be at least 6 characters'
+  });
+}
+
+const existingUser =
+  await User.findOne({
+    email: email.toLowerCase().trim()
+  });
+
+if (existingUser) {
+
+  return res.status(409).json({
+    message:
+      'Email already registered'
+  });
+}
+
+const user = new User({
+  username:
+    username.trim(),
+
+  email:
+    email.toLowerCase().trim(),
+
+  password
+});
+
+await user.save();
+
+res.status(201).json({
+  message:
+    'User registered successfully!'
+});
 
   } catch (error) {
 
@@ -76,9 +140,16 @@ router.post('/login', async (req, res) => {
       password
     } = req.body;
 
+    if (!email || !password) {
+
+  return res.status(400).json({
+    message: 'All fields are required'
+  });
+}
+
     const user = await User.findOne({
-      email
-    });
+  email: email.toLowerCase().trim()
+});
 
     if (!user) {
 
