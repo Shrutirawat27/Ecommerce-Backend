@@ -29,18 +29,39 @@ router.post("/post-review", async (req, res) => {
         });
         }
 
-        const reviews = await Reviews.find({productId});
-        if(reviews.length > 0) {
-            const totalRating = reviews.reduce((acc, review) => acc + review.rating, 0);
-            const averageRating = totalRating / reviews.length;
-            const product = await Products.findById(productId);
-            if(product) {
-                product.rating = averageRating;
-                await product.save({validateBeforeSave: false});
-            } else {
-                return res.status(404).send({ message: "Product not found"})
-            }
-        }
+        const reviews = await Reviews.find({
+  productId
+});
+
+const product =
+  await Products.findById(productId);
+
+if (!product) {
+
+  return res.status(404).send({
+    message: "Product not found"
+  });
+}
+
+if (reviews.length > 0) {
+
+  const totalRating = reviews.reduce(
+    (acc, review) =>
+      acc + review.rating,
+    0
+  );
+
+  product.rating =
+    totalRating / reviews.length;
+
+} else {
+
+  product.rating = 0;
+}
+
+await product.save({
+  validateBeforeSave: false
+});
 
         res.status(200).send({
             message: "Review processed successfully",
